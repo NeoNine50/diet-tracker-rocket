@@ -58,7 +58,7 @@ fn index(flash: Option<FlashMessage>) -> Template {
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
-    let conn = Connection::open("copiosis.sqlite").expect("db file");
+    let conn = Connection::open("diet_tracker.sqlite").expect("db file");
 
     // Initialize the `entries` table in the database.
     db::init_database(&conn);
