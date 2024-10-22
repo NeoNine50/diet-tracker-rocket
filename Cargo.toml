@@ -1,7 +1,6 @@
 [package]
-name = "copiosis-rocket"
-version = "0.2.2"
-authors = ["Michal Mauser <michal.mauser@zeitgeistmovement.cz>"]
+name = "diet-tracker"
+version = "0.1.0"
 edition = "2018"
 
 [features]
@@ -9,16 +8,17 @@ default = ["gui"]
 gui = ["webbrowser"]
 
 [dependencies]
-rocket = "0.5.0-rc.1"
-webbrowser = { version = "0.5.2", optional = true }
+rocket = "0.5.1"
+webbrowser = { version = "1.0.2", optional = true }
+rusqlite = { version = "0.29.0", features = ["bundled"] }
 
 [dependencies.rocket_dyn_templates]
-version = "0.1.0-rc.1"
+version = "0.2.0"
 default-features = false
 features = ["handlebars"]
 
 [dependencies.rocket_sync_db_pools]
-version = "0.1.0-rc.1"
+version = "0.1.0"
 default-features = false
 features = ["sqlite_pool"]
 
