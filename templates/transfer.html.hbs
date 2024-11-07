@@ -3,25 +3,32 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <title>Copiosis</title>
+    <title>Diet Tracker</title>
+    <style>
+        #consumer {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<h1>Copiosis admin</h1>
-<p>Unofficial early development sample</p>
+<h1>Diet Tracker</h1>
+<p></p>
 <p>
-    <a href="/users">Show users</a> &middot;
-    <a href="/products">Show products</a> &middot;
-    <a href="/transfers">Latest transfers</a>
-    <br>
-    <a href="/adduser">Add user</a> &middot;
-    <a href="/product">Add product</a> &middot;
-    <b><a href="/transfer">Transfer</a></b>
+    <a href="/users">Show protocols</a> &middot;
+    <a href="/adduser">Add protocol</a> &middot;
+	<a href="/products">Show items</a> &middot;
+    <a href="/product">Add item</a> &middot;
+    <a href="/transfer">Add to diary</a> &middot;
+    <a href="/transfers">Food diary</a>
 </p>
+<h3>Add an entry to food diary</h3>
+<p>
 <form action="/transfer" method="post" accept-charset="utf-8">
     <table>
-        <tr>
-            <td>
-                <label for="producer">producer</label>
+        </tr>
+		<tr>                 
+			<td>
+			    <label for="producer">Your dietary protocol:</label>
             </td>
             <td>
                 <select name="producer" id="producer" required autofocus>
@@ -32,12 +39,11 @@
             </td>
         </tr>
         <tr>
-            <td>
-                <label for="consumer">consumer</label>
+		    <td>
+			    <label for="consumer"></label>
             </td>
             <td>
                 <select name="consumer" id="consumer" required>
-                    <option value="0">nobody/everybody</option>
                     {{#each users}}
                         <option value="{{id}}">#{{id}} {{name}} ({{nbr}})</option>
                     {{/each}}
@@ -46,7 +52,7 @@
         </tr>
         <tr>
             <td>
-                <label for="product">product</label>
+                <label for="product">Item consumed:</label>
             </td>
             <td>
                 <select name="product" id="product" required>
@@ -58,28 +64,43 @@
         </tr>
         <tr>
             <td>
-                <label for="amount">amount</label>
+                <label for="amount"></label>
             </td>
             <td>
-                <input type="number" name="amount" id="amount" value="1" min="0" step="0.000001" required/>
+                <input type="hidden" name="amount" id="amount" value="1" min="0" step="1" required/>
             </td>
         </tr>
         <tr>
-            <td>
-                <label for="comment">comment</label>
-            </td>
-            <td>
-                <input type="text" name="comment" id="comment" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-            </td>
-            <td>
-                <input type="submit" value="Transfer"/>
-            </td>
-        </tr>
-    </table>
+            <tr>
+    <td>
+        <label for="comment">Notes:</label>
+    </td>
+    <td>
+        <textarea name="comment" id="comment" rows="3" style="width:50%;" oninput="autoExpand(this)"></textarea>
+    </td>
+</tr>
+<tr>
+    <td></td>
+    <td>
+        <input type="submit" value="Transfer"/>
+    </td>
+</tr>
+</table>
 </form>
+
+<script>
+    // Auto-expand function for textareas
+    function autoExpand(textarea) {
+        // Reset the height to allow shrinkage if needed
+        textarea.style.height = 'auto';
+        // Set height based on the scroll height to fit content
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+    }
+
+    // Initial adjustment for all textareas on page load
+    document.querySelectorAll('textarea').forEach(textarea => {
+        autoExpand(textarea);
+    });
+</script>
 </body>
 </html>
