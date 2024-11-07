@@ -73,6 +73,7 @@ async fn main() -> Result<(), rocket::Error> {
             users::product_page,
             products::product_producers,
             users::fame,
+            transfers::update_transfer_comment // Route for updating transfer comment
         ]);
 
     // Automatically open the browser if the "gui" feature is enabled
