@@ -97,55 +97,76 @@ pub async fn transfer(conn: &State<DbConn>, post: Form<Transfer>, templatedir: &
 
     let tmpconn = conn.lock().await;
 
-    let product_query = tmpconn.query_row("SELECT gateway, benefit FROM user_products WHERE ProductID = $1 AND UserID = $2",
-                                          [&transfer.product, &transfer.producer], |row| { Ok((row.get(0)?, row.get(1)?)) });
+    // Check if the product exists for the producer
+    let product_query = tmpconn.query_row(
+        "SELECT gateway, benefit FROM user_products WHERE ProductID = $1 AND UserID = $2",
+        [&transfer.product, &transfer.producer],
+        |row| Ok((row.get(0)?, row.get(1)?))
+    );
+
     if product_query.is_err() {
-        return Flash::success(Redirect::to("/"),
-                       if templatedir.0 { "Produkt musí být nejprve uživateli přiřazen." } else { "Product must be assigned to the user first." })
-    }
-    let product_params:(f64, f64) = product_query.unwrap();
-
-    // let nbr: f64 = tmpconn.query_row("SELECT NBR FROM users WHERE id = $1",
-    //                                  [&transfer.consumer], |row| { row.get(0) })
-    //     .expect("get nbr for user");
-    //
-    // if nbr - product_params.0 * transfer.amount < 0.0 && transfer.consumer != 0 {
-    //     return Flash::success(Redirect::to("/"),
-    //                           if templatedir.0 { "Konzument nemá dostatek NBR." }
-    //                               else { "Consumer has insufficient NBR." })
-    // }
-
-    if transfer.producer == transfer.consumer {
-        return Flash::success(Redirect::to("/"),
-                              if templatedir.0 { "Konzument a producent nesmí být stejná osoba." }
-                                  else { "Consumer and producer must not be the same." })
+        return Flash::success(
+            Redirect::to("/"),
+            if templatedir.0 {
+                "Produkt musí být nejprve uživateli přiřazen."
+            } else {
+                "Product must be assigned to the user first."
+            },
+        );
     }
 
-    if transfer.consumer != 0 {
-        tmpconn.execute("INSERT INTO transfers (ProducerID, ConsumerID, ProductID, amount, NBR, GNBR, comment, time_created)\
-    VALUES ($1, $2, $3, $4, $5, $6, $7, datetime('now', 'localtime'))",
-                        params![&transfer.producer, &transfer.consumer, &transfer.product, &transfer.amount,
-                            &(product_params.1 * transfer.amount), &(product_params.0 * transfer.amount), if transfer.comment.is_empty() { None } else { Some(&transfer.comment) }])
-            .expect("insert single entry into transfers table");
-    } else {
-        tmpconn.execute("INSERT INTO transfers (ProducerID, ConsumerID, ProductID, amount, NBR, GNBR, comment, time_created)\
-    VALUES ($1, $2, $3, $4, $5, $6, $7, datetime('now', 'localtime'))",
-                        params![&transfer.producer, &transfer.consumer, &transfer.product, &transfer.amount,
-                            &(product_params.1 * transfer.amount), &0, if transfer.comment.is_empty() { None } else { Some(&transfer.comment) }])
-            .expect("insert single entry into transfers table");
-    }
-    tmpconn.execute("UPDATE users SET NBR = NBR + $1, fame = fame + $1 WHERE id = $2",
-                    params![&(product_params.1 * transfer.amount), &transfer.producer])
-        .expect("update entries in users table");
-    if transfer.consumer != 0 {
-        tmpconn.execute("UPDATE users SET NBR = NBR - $1 WHERE id = $2",
-                        params![&(product_params.0 * transfer.amount), &transfer.consumer])
-            .expect("update entries in users table");
+    let product_params: (f64, f64) = product_query.unwrap();
+
+    // Insert transfer record in the transfers table
+    tmpconn.execute(
+        "INSERT INTO transfers (ProducerID, ConsumerID, ProductID, amount, NBR, GNBR, comment, time_created) \
+         VALUES ($1, $2, $3, $4, $5, $6, $7, datetime('now', 'localtime'))",
+        params![
+            &transfer.producer,
+            &transfer.consumer,
+            &transfer.product,
+            &transfer.amount,
+            &(product_params.1 * transfer.amount),
+            &(product_params.0 * transfer.amount),
+            if transfer.comment.is_empty() { None } else { Some(&transfer.comment) }
+        ]
+    ).expect("insert single entry into transfers table");
+
+    // Update compliance score
+    tmpconn.execute(
+        "UPDATE users SET NBR = NBR + $1, fame = fame + $1 WHERE id = $2",
+        params![&(product_params.1 * transfer.amount), &transfer.producer]
+    ).expect("update entries in users table");
+
+    // If producer and consumer are different, update NBR for consumer
+    if transfer.producer != transfer.consumer {
+        tmpconn.execute(
+            "UPDATE users SET NBR = NBR - $1 WHERE id = $2",
+            params![&(product_params.0 * transfer.amount), &transfer.consumer]
+        ).expect("update entries in users table");
     }
 
-    Flash::success(Redirect::to("/"),
-                   if templatedir.0 { "Transfer proveden." } else { "Transfer complete." })
+    Flash::success(
+        Redirect::to("/"),
+        if templatedir.0 {
+            "Transfer proveden."
+        } else {
+            "Transfer complete."
+        },
+    )
+}
 
+#[post("/updatetransfer/<transfer_id>", data = "<updated_comment>")]
+pub async fn update_transfer_comment(conn: &State<DbConn>, transfer_id: i64, updated_comment: Form<String>) -> Flash<Redirect> {
+    let tmpconn = conn.lock().await;
+
+    let comment = updated_comment.into_inner();
+    tmpconn.execute(
+        "UPDATE transfers SET comment = $1 WHERE id = $2",
+        params![&comment, &transfer_id],
+    ).expect("Failed to update comment.");
+
+    Flash::success(Redirect::to("http://localhost:8000"), "Note updated successfully.")
 }
 
 #[get("/transfers")]
