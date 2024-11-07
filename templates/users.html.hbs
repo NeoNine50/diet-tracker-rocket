@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <title>Copiosis</title>
+    <title>Diet Tracker</title>
     <style>
     table, th, td {
         border: 1px solid black;
@@ -14,17 +14,18 @@
     </style>
 </head>
 <body>
-<h1>Copiosis admin</h1>
-<p>Unofficial early development sample</p>
+<h1>Diet Tracker</h1>
+<p></p>
 <p>
-    <b><a href="/users">Show users</a></b> &middot;
-    <a href="/products">Show products</a> &middot;
-    <a href="/transfers">Latest transfers</a>
-    <br>
-    <a href="/adduser">Add user</a> &middot;
-    <a href="/product">Add product</a> &middot;
-    <a href="/transfer">Transfer</a>
+    <a href="/users">Show protocols</a> &middot;
+    <a href="/adduser">Add protocol</a> &middot;
+    <a href="/products">Show items</a> &middot;
+    <a href="/product">Add item</a> &middot;
+    <a href="/transfer">Add to diary</a> &middot;
+    <a href="/transfers">Food diary</a>
 </p>
+<h3>Showing all protocols</h3>
+<p>
 
 <form action="/user/product" method="post" accept-charset="utf-8" id="productform">
 Select product to assign: <select name="product_id" id="product_id" form="productform" required>
@@ -36,8 +37,7 @@ Select product to assign: <select name="product_id" id="product_id" form="produc
     <tr>
         <th>ID</th>
         <th>Name</th>
-        <th>NBR</th>
-        <th><a href="/fame" target="_blank">Prestige</a></th>
+        <th><a href="/fame" target="_blank">Compliance stats</a></th>
         <th>Created</th>
         <th>Operation</th>
     </tr>
@@ -45,11 +45,10 @@ Select product to assign: <select name="product_id" id="product_id" form="produc
         <tr>
             <td>{{id}}</td>
             <td>{{name}}</td>
-            <td style="overflow: hidden; max-width: 66px;">{{nbr}}</td>
             <td style="overflow: hidden; max-width: 66px;">{{fame}}</td>
             <td>{{time_created}}</td>
             <td>
-                <button type="submit" value="{{id}}" name="user_id">Assign product</button>
+                <button type="submit" value="{{id}}" name="user_id">Configure dropdown item to protocol</button>
             </td>
         </tr>
     {{/each}}
