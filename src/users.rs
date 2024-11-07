@@ -45,14 +45,15 @@ pub async fn adduser(user: Form<User>, db_conn: &State<DbConn>, templatedir: &St
     let user = user.into_inner();
     let tmpconn = db_conn.lock().await;
 
+    // Insert profile with initial compliance value of 0
     tmpconn.execute("INSERT INTO users (name, NBR, password, time_created)\
     VALUES ($1, $2, $3, datetime('now', 'localtime'))",
                     params![&user.name, &0, &"0"])
-        .expect("insert single entry into products table");
+        .expect("insert single entry into users table");
 
     Flash::success(Redirect::to("/"),
                    if templatedir.0 { "Uživatel přidán." }
-                       else { "User added." })
+                   else { "User added." })
 }
 
 #[get("/users")]
@@ -168,36 +169,41 @@ pub async fn addproduct(product: Form<Product>, db_conn: &State<DbConn>, templat
                               if templatedir.0 { "Error: Brána nesmí být nikdy záporná!" } else { "Error: Gateway must never be negative!" })
     }
 
+    // Calculate the benefit value
     let benefit = p.resabundance * (1.0 + p.beneficiaries / p.producers).ln() *
         (
             p.ccs * p.conssubben + p.cco * p.consobjben +
                 p.ceb * p.envben + p.chb * p.humanben
         );
 
+    // Round up the benefit value
+    let rounded_benefit = benefit.ceil();
+
     let update_result = tmpconn.execute("UPDATE user_products SET UserID = $1, gateway = $2, benefit = $3,
     resabundance = $4, beneficiaries = $5, producers = $6, ccs = $7, conssubben = $8, cco = $9, consobjben = $10,
     ceb = $11, envben = $12, chb = $13, humanben = $14, ProductID = $15
     WHERE ProductID = $15 AND UserID = $1",
-                        params![&p.user_id, &p.gateway, &benefit,
+                                        params![&p.user_id, &p.gateway, &rounded_benefit,
                             &p.resabundance, &p.beneficiaries, &p.producers, &p.ccs, &p.conssubben, &p.cco, &p.consobjben,
                             &p.ceb, &p.envben, &p.chb, &p.humanben, &p.id]);
+
     if update_result.is_ok() && update_result.unwrap() == 1 {
         return Flash::success(Redirect::to("/"),
-                       if templatedir.0 { "Produkt upraven." } else { "Product modified." })
+                              if templatedir.0 { "Produkt upraven." } else { "Product modified." })
     }
 
+    // Insert a new product with the rounded benefit value
     tmpconn.execute("INSERT INTO user_products (UserID, gateway, benefit, time_created,
     resabundance, beneficiaries, producers, ccs, conssubben, cco, consobjben,
     ceb, envben, chb, humanben, ProductID)
     VALUES ($1, $2, $3, datetime('now', 'localtime'), $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
-                        params![&p.user_id, &p.gateway, &benefit,
+                    params![&p.user_id, &p.gateway, &rounded_benefit,
                             &p.resabundance, &p.beneficiaries, &p.producers, &p.ccs, &p.conssubben, &p.cco, &p.consobjben,
                             &p.ceb, &p.envben, &p.chb, &p.humanben, &p.id])
-            .expect("insert single entry into products table");
+        .expect("insert single entry into products table");
 
-        Flash::success(Redirect::to("/"),
-                       if templatedir.0 { "Produkt přidán." } else { "Product added." })
-
+    Flash::success(Redirect::to("/"),
+                   if templatedir.0 { "Produkt přidán." } else { "Product added." })
 }
 
 #[get("/fame")]
