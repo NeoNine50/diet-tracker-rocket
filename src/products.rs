@@ -191,26 +191,3 @@ pub async fn products(db_conn: &State<DbConn>) -> Template {
 
     Template::render("products", TemplateMessage { is_user_product: false, vec})
 }
-
-#[post("/product/update", data = "<form_data>")]
-pub async fn update_product_name(
-    conn: &State<DbConn>,
-    form_data: Form<ProductUpdateForm>
-) -> Flash<Redirect> {
-    let tmpconn = conn.lock().await;
-
-    let ProductUpdateForm { id, updated_name } = form_data.into_inner();
-
-    tmpconn.execute(
-        "UPDATE products SET name = $1 WHERE id = $2",
-        params![&updated_name, &id],
-    ).expect("Failed to update name.");
-
-    Flash::success(Redirect::to("http://localhost:8000"), "Product name updated successfully.")
-}
-
-#[derive(FromForm)]
-pub struct ProductUpdateForm {
-    id: i64,
-    updated_name: String,
-}
