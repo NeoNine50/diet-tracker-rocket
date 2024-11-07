@@ -56,15 +56,15 @@ pub async fn product_page(product_id: i64, db_conn: &State<DbConn>) -> Template 
     let tmpconn = db_conn.lock().await;
     let product: User = tmpconn.query_row("SELECT id, name
     FROM products WHERE id = $1", [&product_id],
-                                             |row| {
-                                                 Ok(User {
-                                                     id: row.get(0)?,
-                                                     name: row.get(1)?,
-                                                     nbr: 0.0,
-                                                     fame: 0.0,
-                                                     time_created: String::new()
-                                                 })
-                                             }).unwrap_or(User {
+                                          |row| {
+                                              Ok(User {
+                                                  id: row.get(0)?,
+                                                  name: row.get(1)?,
+                                                  nbr: 0.0,
+                                                  fame: 0.0,
+                                                  time_created: String::new()
+                                              })
+                                          }).unwrap_or(User {
         id: 0,
         name: String::new(),
         nbr: 0.0,
@@ -138,7 +138,7 @@ pub async fn addproduct(product: Form<User>, db_conn: &State<DbConn>, templatedi
                             &0, &0, &0, &0])
             .expect("insert single entry into products table");
         Flash::success(Redirect::to("/"),
-                       if templatedir.0 { "Produkt přidán." } else { "Product added." })
+                       if templatedir.0 { "Produkt přidán." } else { "Product added (in testing)." })
     }
     else {
         tmpconn.execute("UPDATE products SET name = $1, gateway = $2, benefit = $3,
@@ -190,4 +190,27 @@ pub async fn products(db_conn: &State<DbConn>) -> Template {
     }
 
     Template::render("products", TemplateMessage { is_user_product: false, vec})
+}
+
+#[post("/product/update", data = "<form_data>")]
+pub async fn update_product_name(
+    conn: &State<DbConn>,
+    form_data: Form<ProductUpdateForm>
+) -> Flash<Redirect> {
+    let tmpconn = conn.lock().await;
+
+    let ProductUpdateForm { id, updated_name } = form_data.into_inner();
+
+    tmpconn.execute(
+        "UPDATE products SET name = $1 WHERE id = $2",
+        params![&updated_name, &id],
+    ).expect("Failed to update name.");
+
+    Flash::success(Redirect::to("http://localhost:8000"), "Product name updated successfully.")
+}
+
+#[derive(FromForm)]
+pub struct ProductUpdateForm {
+    id: i64,
+    updated_name: String,
 }
