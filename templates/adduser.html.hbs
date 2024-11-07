@@ -3,28 +3,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Copiosis</title>
+    <title>Diet Tracker</title>
 </head>
 <body>
-<h1>Copiosis admin</h1>
-<p>Unofficial early development sample</p>
+<h1>Diet Tracker</h1>
+<p></p>
 <p>
-    <a href="/users">Show users</a> &middot;
-    <a href="/products">Show products</a> &middot;
-    <a href="/transfers">Latest transfers</a>
-    <br>
-    {{#if nbr}}
-        <b><a href="/adduser">Add user</a></b> &middot;
-        <a href="/product">Add product</a>
-    {{else}}
-        <a href="/adduser">Add user</a> &middot;
-        <b><a href="/product">Add product</a></b>
-    {{/if}} &middot;
-    <a href="/transfer">Transfer</a>
+    <a href="/users">Show protocols</a> &middot;
+    <a href="/adduser">Add protocol</a> &middot;
+    <a href="/products">Show items</a> &middot;
+    <a href="/product">Add item</a> &middot;
+    <a href="/transfer">Add to diary</a> &middot;
+    <a href="/transfers">Food diary</a>
 </p>
+
+<!-- Heading changes based on route -->
+<h3>{{#if nbr}}Add new protocol{{else}}Add new item{{/if}}</h3>
+
+<p>
 <form action="{{#if nbr}}/adduser{{else}}/product{{/if}}" method="post" accept-charset="utf-8">
     <input type="hidden" name="id" value="0" />
-    <label for="name">name</label>
+    <label for="name">Name:</label>
     <input type="text" name="name" id="name" value="{{name}}" required autofocus/>
     <input type="hidden" name="id" value="{{id}}"/>
     <input type="hidden" name="nbr" value="0" />
