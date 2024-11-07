@@ -3,20 +3,21 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Copiosis</title>
+    <title>Diet Tracker</title>
 </head>
 <body>
-<h1>Copiosis admin</h1>
-<p>Unofficial early development sample</p>
+<h1>Diet Tracker</h1>
+<p></p>
 <p>
-    <a href="/users">Show users</a> &middot;
-    <a href="/products">Show products</a> &middot;
-    <a href="/transfers">Latest transfers</a>
-    <br>
-    <a href="/adduser">Add user</a> &middot;
-    <b><a href="/product">Add product</a></b> &middot;
-    <a href="/transfer">Transfer</a>
+    <a href="/users">Show protocols</a> &middot;
+    <a href="/adduser">Add protocol</a> &middot;
+    <a href="/products">Show items</a> &middot;
+    <a href="/product">Add item</a> &middot;
+    <a href="/transfer">Add to diary</a> &middot;
+    <a href="/transfers">Food diary</a>
 </p>
+<h3>Food value calculator configuration</h3>
+<p>
 <form action="/user/addproduct" method="post" accept-charset="utf-8">
     <table>
         <!--<tr>
@@ -24,59 +25,58 @@
             <td></td><td><input type="text" required disabled /></td><td></td>
         </tr>-->
         <tr>
-            <td><label for="gateway">gateway</label></td>
-            <td></td><td><input type="number" name="gateway" id="gateway" value="{{gateway}}" min="0" step="0.000001" required autofocus /></td><td></td>
-        </tr><tr><td colspan="4"><hr><td></td></tr>
-
+            <td><label for="gateway">User defined sensitivity rating</label></td>
+            <td></td><td><input type="number" name="gateway" id="gateway" value="{{gateway}}" min="0" max="2" step="1" required autofocus /></td><td></td>
+		</tr>
         <tr>
-            <td><label for="resabundance">resource abundance</label></td>
-            <td>0</td><td><input type="number" name="resabundance" id="resabundance" value="{{resabundance}}" min="0" step="0.01" required /></td><td>&infin;</td>
+            <td><label for="resabundance"></label></td>
+            <td></td><td><input type="hidden" name="resabundance" id="resabundance" value="{{resabundance}}" min="0" step="0.01" required /></td><td></td>
         </tr>
         <tr>
-            <td><label for="beneficiaries">number of beneficiaries</label></td>
-            <td>0</td><td><input type="number" name="beneficiaries" id="beneficiaries" value="{{beneficiaries}}" min="0" required /></td><td>&infin;</td>
+            <td><label for="beneficiaries"></label></td>
+            <td></td><td><input type="hidden" name="beneficiaries" id="beneficiaries" value="{{beneficiaries}}" min="0" required /></td><td></td>
         </tr>
         <tr>
-            <td><label for="producers">number of producers</label></td>
-            <td>0</td><td><input type="number" name="producers" id="producers" value="{{producers}}" min="0" required /></td><td>&infin;</td>
-        </tr>
-
-        <tr><td colspan="4"><hr></td></tr>
-
-        <tr>
-            <td><label for="conssubben">consumer subjective benefit</label></td>
-            <td>-100%</td><td><input type="range" name="conssubben" id="conssubben" value="{{conssubben}}" min="-1" max="1" step="0.1" required /></td><td>100%</td>
-        </tr>
-        <tr>
-            <td><label for="ccs">consumer subj. benefit tun.</label></td>
-            <td>0</td><td><input type="number" name="ccs" id="ccs" value="{{ccs}}" min="0" step="0.000001" required /></td><td>&infin;</td>
-        </tr>
-        <tr>
-            <td><label for="consobjben">consumer objective benefit</label></td>
-            <td>-100%</td><td><input type="range" name="consobjben" id="consobjben" value="{{consobjben}}" min="-1" max="1" step="0.1" required /></td><td>100%</td>
-        </tr>
-        <tr>
-            <td><label for="cco">consumer objective benefit tun.</label></td>
-            <td>0</td><td><input type="number" name="cco" id="cco" value="{{cco}}" min="0" step="0.000001" required /></td><td>&infin;</td>
+            <td><label for="producers"></label></td>
+            <td></td><td><input type="hidden" name="producers" id="producers" value="{{producers}}" min="0" required /></td><td></td>
         </tr>
 
         <tr><td colspan="4"><hr></td></tr>
 
         <tr>
-            <td><label for="envben">environmental benefit</label></td>
-            <td>-100%</td><td><input type="range" name="envben" id="envben" value="{{envben}}" min="-1" max="1" step="0.1" required /></td><td>100%</td>
+            <td><label for="conssubben">blood type & secretor status value</label></td>
+            <td></td><td><input type="number" name="conssubben" id="conssubben" value="{{conssubben}}" min="-4" max="4" step="1" required /></td><td></td>
         </tr>
         <tr>
-            <td><label for="ceb">environmental benefit tun.</label></td>
-            <td>0</td><td><input type="number" name="ceb" id="ceb" value="{{ceb}}" min="0" step="0.000001" required /></td><td>&infin;</td>
+            <td><label for="ccs">blood value tun.</label></td>
+            <td></td><td><input type="number" name="ccs" id="ccs" value="{{ccs}}" min="0" step="0.01" required /></td><td></td>
         </tr>
         <tr>
-            <td><label for="humanben">human benefit</label></td>
-            <td>-100%</td><td><input type="range" name="humanben" id="humanben" value="{{humanben}}" min="-1" max="1" step="0.1" required /></td><td>100%</td>
+            <td><label for="consobjben">genotype value</label></td>
+            <td></td><td><input type="number" name="consobjben" id="consobjben" value="{{consobjben}}" min="-4" max="4" step="1" required /></td><td></td>
         </tr>
         <tr>
-            <td><label for="chb">human benefit tun.</label></td>
-            <td>0</td><td><input type="number" name="chb" id="chb" value="{{chb}}" min="0" step="0.000001" required /></td><td>&infin;</td>
+            <td><label for="cco"></label>genotype value tun.</td>
+            <td></td><td><input type="number" name="cco" id="cco" value="{{cco}}" min="0" step="0.01" required /></td><td></td>
+        </tr>
+
+        <tr><td colspan="4"><hr></td></tr>
+
+        <tr>
+            <td><label for="envben">microbiome diversity value</label></td>
+            <td></td><td><input type="number" name="envben" id="envben" value="{{envben}}" min="-4" max="4" step="1" required /></td><td></td>
+        </tr>
+        <tr>
+            <td><label for="ceb"></label>microbiome value tun.</td>
+            <td></td><td><input type="number" name="ceb" id="ceb" value="{{ceb}}" min="0" step="0.01" required /></td><td></td>
+        </tr>
+        <tr>
+            <td><label for="humanben">weight loss value</label></td>
+            <td></td><td><input type="number" name="humanben" id="humanben" value="{{humanben}}" min="-4" max="4" step="1" required /></td><td></td>
+        </tr>
+        <tr>
+            <td><label for="chb"></label>weight loss value tun.</td>
+            <td></td><td><input type="number" name="chb" id="chb" value="{{chb}}" min="0" step="0.01" required /></td><td></td>
         </tr>
 
         <tr><td colspan="4"><hr><td></td></tr>
@@ -87,7 +87,6 @@
                 <input type="hidden" name="benefit" value="0" />
                 <input type="hidden" name="user_id" value="{{user_id}}" />
                 <input type="hidden" name="name" id="name" value="{{name}}">
-                Formula can be found here in the included PDF.</td>
             <td></td><td><input type="submit" value="Submit" /></td><td></td>
         </tr>
     </table>
