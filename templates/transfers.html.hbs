@@ -1,57 +1,220 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <title>Copiosis</title>
+    <title>Diet Tracker</title>
     <style>
-    table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
-        padding: 1px 10px;
-    }
-
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 1px 10px;
+        }
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .table-info {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Add space between "Show" label, dropdown, and "entries" text */
+        }
+        .search-box {
+            display: flex;
+            align-items: right;
+            justify-content: center;
+            width: 100%; /* Centers the search box within the .table-controls */
+        }
+        .table-pagination {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Add space between "Showing X to Y of Z entries" and pagination buttons */
+            margin-top: 5px;
+        }
+        th {
+            cursor: pointer;
+        }
+        th .sort-indicator {
+            margin-left: 5px;
+            font-size: 10px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
-<h1>Copiosis admin</h1>
-<p>Unofficial early development sample</p>
+<h1>Diet Tracker</h1>
+<p></p>
 <p>
-    <a href="/users">Show users</a> &middot;
-    <a href="/products">Show products</a> &middot;
-    <b><a href="/transfers">Latest transfers</a></b>
-    <br>
-    <a href="/adduser">Add user</a> &middot;
-    <a href="/product">Add product</a> &middot;
-    <a href="/transfer">Transfer</a>
+    <a href="/users">Show protocols</a> &middot;
+    <a href="/adduser">Add protocol</a> &middot;
+    <a href="/products">Show items</a> &middot;
+    <a href="/product">Add item</a> &middot;
+    <a href="/transfer">Add to diary</a> &middot;
+    <a href="/transfers">Food diary</a>
 </p>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Producer</th>
-        <th>Consumer</th>
-        <th>Product</th>
-        <th>Amount</th>
-        <th>NBR</th>
-        <th>-NBR</th>
-        <th>Created</th>
-        <th>Operation</th>
-        <th>Comment</th>
-    </tr>
-    {{#each this}}
+<h3>Food diary records</h3>
+<p>
+<div class="table-controls">
+    <div class="table-info">
+        <label for="entries">Show</label>
+        <select id="entries" onchange="updateTable()">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span>entries</span>
+    </div>
+    <div class="search-box">
+        <label for="search" style="margin-right: 5px;">Search:</label>
+        <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
+    </div>
+</div>
+
+<table id="data-table">
+    <thead>
+        <tr>
+            <th onclick="sortTable(0)">ID <span class="sort-indicator" id="sort-indicator-0">▲▼</span></th>
+            <th onclick="sortTable(1)">Protocol <span class="sort-indicator" id="sort-indicator-1">▲▼</span></th>
+            <th onclick="sortTable(2)">Product <span class="sort-indicator" id="sort-indicator-2">▲▼</span></th>
+            <th onclick="sortTable(3)">Net-compliance <span class="sort-indicator" id="sort-indicator-3">▲▼</span></th>
+            <th onclick="sortTable(4)">Sensitivity level<span class="sort-indicator" id="sort-indicator-4">▲▼</span></th>
+            <th onclick="sortTable(5)">Created <span class="sort-indicator" id="sort-indicator-5">▲▼</span></th>
+            <th>Note</th>
+            <th>Operation</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each this}}
         <tr>
             <td>{{id}}</td>
             <td>{{producer}}</td>
-            <td>{{consumer}}</td>
             <td>{{product}}</td>
-            <td>{{amount}}</td>
             <td style="overflow: hidden; max-width: 66px;">{{nbr}}</td>
             <td style="overflow: hidden; max-width: 66px;">{{gnbr}}</td>
             <td>{{time_created}}</td>
-            <td><a href="/deletetransfer/{{id}}">Delete</a></td>
-            <td>{{comment}}</td>
+            <td>
+                <form action="/updatetransfer/{{id}}" method="post" style="margin-top: 8px;">
+                    <label for="comment-{{id}}" class="visually-hidden">Edit note</label>
+                    <textarea id="comment-{{id}}" name="updated_comment" rows="2" style="width:100%;" oninput="autoExpand(this)">{{comment}}</textarea>
+                    <button type="submit">Save edit</button>
+                </form>
+            </td>
+            <td>
+                <a href="/deletetransfer/{{id}}">Delete record</a>
+            </td>
         </tr>
-    {{/each}}
+        {{/each}}
+    </tbody>
 </table>
+
+<div class="table-pagination">
+    <span id="table-info"></span>
+    <button onclick="prevPage()">Previous</button>
+    <span id="page-numbers"></span>
+    <button onclick="nextPage()">Next</button>
+</div>
+
+<script>
+    let currentPage = 1;
+    let entriesPerPage = 10;
+    let sortDirection = Array(7).fill(true); // Track sorting direction for each column (true for ascending)
+
+    function updateTable() {
+        entriesPerPage = parseInt(document.getElementById("entries").value);
+        currentPage = 1;
+        displayTable();
+    }
+
+    function searchTable() {
+        currentPage = 1;
+        displayTable();
+    }
+
+    function displayTable() {
+        const table = document.getElementById("data-table");
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const searchText = document.getElementById("search").value.toLowerCase();
+
+        const filteredRows = rows.filter(row => row.innerText.toLowerCase().includes(searchText));
+        const totalEntries = filteredRows.length;
+        const totalPages = Math.ceil(totalEntries / entriesPerPage);
+        const start = (currentPage - 1) * entriesPerPage;
+        const end = start + entriesPerPage;
+
+        rows.forEach(row => row.style.display = "none");
+        filteredRows.slice(start, end).forEach(row => row.style.display = "");
+
+        document.getElementById("table-info").innerText = `Showing ${start + 1} to ${Math.min(end, totalEntries)} of ${totalEntries} entries`;
+        updatePageNumbers(totalPages);
+    }
+
+    function updatePageNumbers(totalPages) {
+        const pageNumbers = document.getElementById("page-numbers");
+        pageNumbers.innerHTML = "";
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerText = i;
+            pageButton.onclick = () => {
+                currentPage = i;
+                displayTable();
+            };
+            pageNumbers.appendChild(pageButton);
+        }
+    }
+
+    function nextPage() {
+        currentPage++;
+        displayTable();
+    }
+
+    function prevPage() {
+        currentPage = Math.max(1, currentPage - 1);
+        displayTable();
+    }
+
+    function sortTable(n) {
+        const table = document.getElementById("data-table");
+        const tbody = table.querySelector("tbody");
+        let rows = Array.from(tbody.querySelectorAll("tr"));
+        const ascending = sortDirection[n];
+
+        rows.sort((a, b) => {
+            const x = a.cells[n].innerText;
+            const y = b.cells[n].innerText;
+            return ascending ? x.localeCompare(y) : y.localeCompare(x);
+        });
+
+        sortDirection[n] = !ascending;
+        rows.forEach(row => tbody.appendChild(row));
+
+        updateSortIndicators(n, ascending);
+    }
+
+    function updateSortIndicators(columnIndex, ascending) {
+        const indicators = document.querySelectorAll(".sort-indicator");
+        indicators.forEach((indicator, index) => {
+            if (index === columnIndex) {
+                indicator.innerText = ascending ? "▲" : "▼";
+            } else {
+                indicator.innerText = "▲▼";
+            }
+        });
+    }
+
+    function autoExpand(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+    }
+
+    document.querySelectorAll('textarea').forEach(textarea => {
+        autoExpand(textarea);
+    });
+
+    displayTable(); // Initial call to display the table
+</script>
 </body>
 </html>
