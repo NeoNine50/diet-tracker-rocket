@@ -10,6 +10,8 @@ Make sure you have copied the templates folder to the target/release folder of y
 
 Windows users may need to have Visual Studio Build Tools 2019 installed to be able to compile. Choose at least Community edition: https://visualstudio.microsoft.com/downloads/
 
+If compilation fails with an error, try deleting the Cargo.lock file in the diet-tracker-rocket-master folder and reattempt. A fresh Cargo.lock file will be generated.
+
 Linux users may need to have **libsqlite3-dev** installed.
 
 Windows build requires **sqlite3.dll** in the target/{debug, release}/deps folder.
