@@ -63,6 +63,9 @@ pub fn init_database(conn: &Connection) {
             [],
         )
         .expect("create transfers table");
+        conn.execute("INSERT OR IGNORE INTO users (id, name, NBR, password, time_created)
+        VALUES (0, '-', 0, 0, datetime('now','localtime'))", [])
+            .expect("insert single entry into table");
 
         conn.execute(
             "CREATE TABLE user_products (
@@ -96,7 +99,7 @@ pub fn init_database(conn: &Connection) {
         .expect("check users table count");
 
     // List of blood types to add to the users table
-    if user_count == 0 {
+    if user_count == 1 {
         let blood_types = vec![
             "Blood Type A Secretor",
             "Blood Type A Non-Secretor",
