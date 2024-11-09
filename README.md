@@ -1,18 +1,16 @@
 Does not work on Windows XP!
 
-Linux users should install sqlite3.
+Linux users should install sqlite3. If you are having problems, check if you have **libsqlite3-dev** installed.
 
-After extracting, right click anywhere in the extracted diet-tracker-rocket-master folder and select Open in Terminal. After typing this command, hit enter: cargo build --release
+After extracting the zip from this repository, right click where there is no icons in the extracted diet-tracker-rocket-master folder and select Open in Terminal. After typing this command, hit enter: cargo build --release
 
-To compile you need Rust with cargo: https://rustup.rs
+To compile with the command above, you'll need Rust with cargo: https://rustup.rs
 
-Make sure you have copied the templates folder to the target/release folder of your build for the application to start.
+Make sure you have copied the templates folder to the target/release folder of your build for the application to start from the release folder.
 
 Windows users may need to have Visual Studio Build Tools 2019 installed to be able to compile. Choose at least Community edition: https://visualstudio.microsoft.com/downloads/
 
 If compilation fails with an error, try deleting the Cargo.lock file in the diet-tracker-rocket-master folder and reattempt. A fresh Cargo.lock file will be generated.
-
-Linux users may need to have **libsqlite3-dev** installed.
 
 Windows build requires **sqlite3.dll** in the target/{debug, release}/deps folder.
 
