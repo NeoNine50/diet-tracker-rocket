@@ -25,10 +25,9 @@
 <p>
 <form action="/transfer" method="post" accept-charset="utf-8">
     <table>
-        </tr>
-		<tr>                 
-			<td>
-			    <label for="producer">Your dietary protocol:</label>
+        <tr>
+            <td>
+                <label for="producer">Your dietary protocol:</label>
             </td>
             <td>
                 <select name="producer" id="producer" required autofocus>
@@ -36,11 +35,14 @@
                         <option value="{{id}}">#{{id}} {{name}} ({{nbr}})</option>
                     {{/each}}
                 </select>
+                <label>
+                    <input type="checkbox" id="defaultProducer"> Make Default
+                </label>
             </td>
         </tr>
         <tr>
-		    <td>
-			    <label for="consumer"></label>
+            <td>
+		<label for="consumer"></label>
             </td>
             <td>
                 <select name="consumer" id="consumer" required>
@@ -61,6 +63,9 @@
                         <option value="{{id}}">#{{id}} {{name}}</option>
                     {{/each}}
                 </select>
+                <button type="button" onclick="window.location.href='http://localhost:8000/users'">
+                    Configure sensitivity and values
+                </button>
             </td>
         </tr>
         <tr>
@@ -72,35 +77,59 @@
             </td>
         </tr>
         <tr>
-            <tr>
-    <td>
-        <label for="comment">Notes:</label>
-    </td>
-    <td>
-        <textarea name="comment" id="comment" rows="3" style="width:50%;" oninput="autoExpand(this)"></textarea>
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <input type="submit" value="Transfer"/>
-    </td>
-</tr>
-</table>
+            <td>
+                <label for="comment">Notes:</label>
+            </td>
+            <td>
+                <textarea name="comment" id="comment" rows="3" style="width:50%;" oninput="autoExpand(this)"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input type="submit" value="Transfer"/>
+            </td>
+        </tr>
+    </table>
 </form>
 
 <script>
     // Auto-expand function for textareas
     function autoExpand(textarea) {
-        // Reset the height to allow shrinkage if needed
         textarea.style.height = 'auto';
-        // Set height based on the scroll height to fit content
         textarea.style.height = (textarea.scrollHeight) + 'px';
     }
 
     // Initial adjustment for all textareas on page load
     document.querySelectorAll('textarea').forEach(textarea => {
         autoExpand(textarea);
+    });
+
+    // Load default producer on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        const defaultProducer = localStorage.getItem('defaultProducer');
+        const producerSelect = document.getElementById('producer');
+        const defaultCheckbox = document.getElementById('defaultProducer');
+
+        // Set the default producer if saved in localStorage
+        if (defaultProducer) {
+            producerSelect.value = defaultProducer;
+            defaultCheckbox.checked = true;
+        }
+
+        // Update the checkbox status when the producer selection changes
+        producerSelect.addEventListener('change', () => {
+            defaultCheckbox.checked = (producerSelect.value === defaultProducer);
+        });
+
+        // Save or remove default producer based on checkbox status
+        defaultCheckbox.addEventListener('change', () => {
+            if (defaultCheckbox.checked) {
+                localStorage.setItem('defaultProducer', producerSelect.value);
+            } else {
+                localStorage.removeItem('defaultProducer');
+            }
+        });
     });
 </script>
 </body>
