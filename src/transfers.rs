@@ -110,7 +110,7 @@ pub async fn transfer(conn: &State<DbConn>, post: Form<Transfer>, templatedir: &
             if templatedir.0 {
                 "Produkt musí být nejprve uživateli přiřazen."
             } else {
-                "Product must be assigned to the user first."
+                "Product must be assigned to profile first under 'Show protocols' in protocol-item configuration menu."
             },
         );
     }
