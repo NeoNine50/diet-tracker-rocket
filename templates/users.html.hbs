@@ -1,21 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <title>Diet Tracker</title>
+    <title>Diet Tracker - Users</title>
     <style>
-    table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
-        padding: 1px 10px;
-    }
-
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 1px 10px;
+        }
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .search-box {
+            margin-left: auto;
+			transform: translateX(-1000px);
+        }
+		.pagination-button {
+            padding: 5px;
+            margin: 2px;
+            cursor: pointer;
+        }
+        .pagination-button.active {
+            font-weight: bold;
+            background-color: #C0C0C2;
+            color: black;
+        }	
+        th {
+            cursor: pointer;
+        }
+        th .sort-arrow {
+            margin-left: 5px;
+            font-size: 10px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
 <h1>Diet Tracker</h1>
-<p></p>
 <p>
     <a href="/users">Show protocols</a> &middot;
     <a href="/adduser">Add protocol</a> &middot;
@@ -25,34 +51,150 @@
     <a href="/transfers">Food diary</a>
 </p>
 <h3>Showing all protocols</h3>
-<p>
 
-<form action="/user/product" method="post" accept-charset="utf-8" id="productform">
-Select product to assign: <select name="product_id" id="product_id" form="productform" required>
-    {{#each products}}
-        <option value="{{id}}">#{{id}} {{name}}</option>
-    {{/each}}
-</select><br><br>
-<table>
+<form action="/user/product" method="post" id="productform">
+    <label for="product_id">Select product to assign:</label>
+    <select name="product_id" id="product_id" form="productform" required>
+        {{#each products}}
+            <option value="{{id}}">#{{id}} {{name}}</option>
+        {{/each}}
+    </select>
+    <br><br>
+
+<div class="table-controls">
+    <label for="entries">Show</label>
+    <select id="entries" onchange="updateTable()">
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+    </select>
+    <span>entries</span>
+    <input type="text" id="search" placeholder="Search..." class="search-box" onkeyup="searchTable()">
+</div>
+
+    <table id="user-table">
+  <thead>
     <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th><a href="/fame" target="_blank">Compliance stats</a></th>
-        <th>Created</th>
-        <th>Operation</th>
+      <th onclick="sortTable(0)">ID <span class="sort-arrow" id="sort-arrow-0">▲▼</span></th>
+      <th onclick="sortTable(1)">Name <span class="sort-arrow" id="sort-arrow-1">▲▼</span></th>
+      <th>
+        <a href="/fame" target="_blank">Compliance stats</a>
+        <span onclick="sortTable(2)"><span class="sort-arrow" id="sort-arrow-2">▲▼</span></th>
+      </th>
+      <th onclick="sortTable(3)">Created <span class="sort-arrow" id="sort-arrow-3">▲▼</span></th>
+      <th>Operation</th>
     </tr>
+  </thead>
+  <tbody>
     {{#each users}}
-        <tr>
-            <td>{{id}}</td>
-            <td>{{name}}</td>
-            <td style="overflow: hidden; max-width: 66px;">{{fame}}</td>
-            <td>{{time_created}}</td>
-            <td>
-                <button type="submit" value="{{id}}" name="user_id">Configure dropdown item to protocol</button>
-            </td>
-        </tr>
+    <tr>
+      <td>{{id}}</td>
+      <td>{{name}}</td>
+      <td style="overflow: hidden; max-width: 66px;">{{fame}}</td>
+      <td>{{time_created}}</td>
+      <td>
+        <button type="submit" value="{{id}}" name="user_id">Configure dropdown item to protocol</button>
+      </td>
+    </tr>
     {{/each}}
+  </tbody>
 </table>
 </form>
+
+<div class="table-pagination">
+    <span id="table-info"></span>
+    <button onclick="prevPage()">Previous</button>
+    <span id="page-numbers"></span>
+    <button onclick="nextPage()">Next</button>
+</div>
+
+<script>
+    let currentPage = 1;
+    let entriesPerPage = 25;
+	let sortDirection = true; // true = ascending, false = descending
+	const maxPageButtons = 10;
+
+    function updateTable() {
+        entriesPerPage = parseInt(document.getElementById("entries").value);
+        currentPage = 1;
+        displayTable();
+    }
+
+    function searchTable() {
+        currentPage = 1;
+        displayTable();
+    }
+
+    function displayTable() {
+        const table = document.getElementById("user-table");
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const searchText = document.getElementById("search").value.toLowerCase();
+
+        const filteredRows = rows.filter(row => row.innerText.toLowerCase().includes(searchText));
+
+        const totalEntries = filteredRows.length;
+        const totalPages = Math.ceil(totalEntries / entriesPerPage);
+        const start = (currentPage - 1) * entriesPerPage;
+        const end = start + entriesPerPage;
+
+        rows.forEach(row => row.style.display = "none");
+        filteredRows.slice(start, end).forEach(row => row.style.display = "");
+
+        document.getElementById("table-info").innerText = `Showing ${start + 1} to ${Math.min(end, totalEntries)} of ${totalEntries} entries`;
+        updatePageNumbers(totalPages);
+    }
+
+    function updatePageNumbers(totalPages) {
+        const pageNumbers = document.getElementById("page-numbers");
+        pageNumbers.innerHTML = "";
+
+        const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+        const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+        for (let i = startPage; i <= endPage; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.className = "pagination-button";
+            if (i === currentPage) pageButton.classList.add("active");
+            pageButton.innerText = i;
+            pageButton.onclick = () => {
+                currentPage = i;
+                displayTable();
+            };
+            pageNumbers.appendChild(pageButton);
+        }
+    }
+
+    function nextPage() {
+        currentPage++;
+        displayTable();
+    }
+
+    function prevPage() {
+        currentPage = Math.max(1, currentPage - 1);
+        displayTable();
+    }
+
+    function sortTable(n) {
+        const table = document.getElementById("user-table");
+        let rows = Array.from(table.querySelector("tbody").rows);
+        
+        rows.sort((a, b) => {
+            let x = a.cells[n].innerText.toLowerCase();
+            let y = b.cells[n].innerText.toLowerCase();
+            return sortDirection ? (x > y ? 1 : -1) : (x < y ? 1 : -1);
+        });
+
+        sortDirection = !sortDirection;
+        rows.forEach(row => table.querySelector("tbody").appendChild(row));
+        
+        document.querySelectorAll(".sort-arrow").forEach(arrow => arrow.innerText = "▲▼");
+        document.getElementById(`sort-arrow-${n}`).innerText = sortDirection ? "▲" : "▼";
+        
+        displayTable();
+    }
+
+    displayTable();
+</script>
 </body>
 </html>
