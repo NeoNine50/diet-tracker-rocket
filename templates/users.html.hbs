@@ -16,7 +16,7 @@
             align-items: center;
             margin-bottom: 10px;
 	}	
-	    .table-info {
+	.table-info {
             display: flex;
             align-items: center;
             gap: 5px;	
@@ -25,7 +25,7 @@
             margin-left: auto;
 	    transform: translateX(-1000px);
         }
-        .pagination-button {
+	.pagination-button {
             padding: 5px;
             margin: 2px;
             cursor: pointer;
@@ -204,6 +204,27 @@
     }
 
     displayTable();
+	
+    document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const producer = urlParams.get("producer");
+    const product = urlParams.get("product");
+
+    if (producer) {
+        document.getElementById("search").value = producer;
+        searchTable(); // Trigger search if required
+    }
+
+    if (product) {
+        const productSelect = document.getElementById("product_id");
+        for (let option of productSelect.options) {
+            if (option.text.includes(product)) {
+                option.selected = true;
+                break;
+            }
+        }
+    }
+});
 </script>
 </body>
 </html>
