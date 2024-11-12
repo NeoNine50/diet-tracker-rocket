@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <title>Diet Tracker</title>
+    <title>Diet Tracker - Transfers</title>
     <style>
         table, th, td {
             border: 1px solid black;
@@ -19,19 +19,31 @@
         .table-info {
             display: flex;
             align-items: center;
-            gap: 10px; /* Add space between "Show" label, dropdown, and "entries" text */
+            gap: 10px;
         }
         .search-box {
-            display: flex;
-            align-items: right;
-            justify-content: center;
-            width: 100%; /* Centers the search box within the .table-controls */
+            margin: auto;
+            transform: translateX(320px);
+        }
+		.pagination-button {
+            padding: 5px;
+            margin: 2px;
+            cursor: pointer;
+        }
+        .pagination-button.active {
+            font-weight: bold;
+            background-color: #C0C0C2;
+            color: black;
         }
         .table-pagination {
             display: flex;
             align-items: center;
-            gap: 10px; /* Add space between "Showing X to Y of Z entries" and pagination buttons */
+            gap: 10px;
             margin-top: 5px;
+        }
+        .page-button.active {
+            font-weight: bold;
+            background-color: #ddd;
         }
         th {
             cursor: pointer;
@@ -68,7 +80,6 @@
         <span>entries</span>
     </div>
     <div class="search-box">
-        <label for="search" style="margin-right: 5px;">Search:</label>
         <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
     </div>
 </div>
@@ -80,7 +91,7 @@
             <th onclick="sortTable(1)">Protocol <span class="sort-indicator" id="sort-indicator-1">▲▼</span></th>
             <th onclick="sortTable(2)">Product <span class="sort-indicator" id="sort-indicator-2">▲▼</span></th>
             <th onclick="sortTable(3)">Net-compliance <span class="sort-indicator" id="sort-indicator-3">▲▼</span></th>
-            <th onclick="sortTable(4)">Sensitivity level<span class="sort-indicator" id="sort-indicator-4">▲▼</span></th>
+            <th onclick="sortTable(4)">Sensitivity level <span class="sort-indicator" id="sort-indicator-4">▲▼</span></th>
             <th onclick="sortTable(5)">Created <span class="sort-indicator" id="sort-indicator-5">▲▼</span></th>
             <th>Note</th>
             <th>Operation</th>
@@ -120,7 +131,8 @@
 <script>
     let currentPage = 1;
     let entriesPerPage = 10;
-    let sortDirection = Array(7).fill(true); // Track sorting direction for each column (true for ascending)
+    let sortDirection = Array(7).fill(true);
+	const maxPageButtons = 10;
 
     function updateTable() {
         entriesPerPage = parseInt(document.getElementById("entries").value);
@@ -155,8 +167,14 @@
     function updatePageNumbers(totalPages) {
         const pageNumbers = document.getElementById("page-numbers");
         pageNumbers.innerHTML = "";
-        for (let i = 1; i <= totalPages; i++) {
+
+        const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+        const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+        for (let i = startPage; i <= endPage; i++) {
             const pageButton = document.createElement("button");
+            pageButton.className = "pagination-button";
+            if (i === currentPage) pageButton.classList.add("active");
             pageButton.innerText = i;
             pageButton.onclick = () => {
                 currentPage = i;
@@ -214,7 +232,7 @@
         autoExpand(textarea);
     });
 
-    displayTable(); // Initial call to display the table
+    displayTable();
 </script>
 </body>
 </html>
