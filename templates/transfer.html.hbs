@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <title>Diet Tracker</title>
+    <title>Diet Tracker - Transfer</title>
     <style>
         #consumer {
             display: none;
@@ -30,23 +30,24 @@
                 <label for="producer">Your dietary protocol:</label>
             </td>
             <td>
-                <select name="producer" id="producer" required autofocus>
-                    {{#each users}}
-                        <option value="{{id}}">#{{id}} {{name}} ({{nbr}})</option>
-                    {{/each}}
-                </select>
-                <label>
-                    <input type="checkbox" id="defaultProducer"> Make Default
-                </label>
-            </td>
+              <select name="producer" id="producer" required autofocus>
+                  {{#each users}}
+              <option value="{{id}}" data-id="{{id}}" data-nbr="{{nbr}}">{{name}}</option>
+                  {{/each}}
+                  </select>
+                  <label>
+                  <input type="checkbox" id="defaultProducer"> Make Default
+                  </label>
+             </td>
+             <td>
         </tr>
         <tr>
-            <td>
+	    <td>
 		<label for="consumer"></label>
             </td>
             <td>
                 <select name="consumer" id="consumer" required>
-		    <option value="0">nobody/everybody</option>
+		<option value="0">nobody/everybody</option>
                     {{#each users}}
                         <option value="{{id}}">#{{id}} {{name}} ({{nbr}})</option>
                     {{/each}}
@@ -62,8 +63,8 @@
                     {{#each products}}
                         <option value="{{id}}">#{{id}} {{name}}</option>
                     {{/each}}
-                </select>
-                <button type="button" onclick="window.location.href='http://localhost:8000/users'">
+		</select>	
+                <button type="button" onclick="configureSensitivityAndValues()">
                     Configure sensitivity and values
                 </button>
             </td>
@@ -94,6 +95,15 @@
 </form>
 
 <script>
+    function configureSensitivityAndValues() {
+    const producerSelect = document.getElementById('producer');
+    const productSelect = document.getElementById('product');
+    const selectedProducer = producerSelect.options[producerSelect.selectedIndex].text;
+    const selectedProduct = productSelect.options[productSelect.selectedIndex].text;
+
+    const url = `http://localhost:8000/users?producer=${encodeURIComponent(selectedProducer)}&product=${encodeURIComponent(selectedProduct)}`;
+    window.location.href = url;
+    }
     // Auto-expand function for textareas
     function autoExpand(textarea) {
         textarea.style.height = 'auto';
