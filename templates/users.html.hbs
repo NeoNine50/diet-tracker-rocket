@@ -15,12 +15,17 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+	}	
+	    .table-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;	
         }
         .search-box {
             margin-left: auto;
-			transform: translateX(-1000px);
+	    transform: translateX(-1000px);
         }
-		.pagination-button {
+        .pagination-button {
             padding: 5px;
             margin: 2px;
             cursor: pointer;
@@ -62,14 +67,18 @@
     <br><br>
 
 <div class="table-controls">
-    <label for="entries">Show</label>
-    <select id="entries" onchange="updateTable()">
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-    </select>
-    <span>entries</span>
-    <input type="text" id="search" placeholder="Search..." class="search-box" onkeyup="searchTable()">
+    <div class="table-info">
+        <label for="entries">Show</label>
+        <select id="entries" onchange="updateTable()">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span>entries</span>
+    </div>
+    <div class="search-box">
+        <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
+    </div>
 </div>
 
     <table id="user-table">
