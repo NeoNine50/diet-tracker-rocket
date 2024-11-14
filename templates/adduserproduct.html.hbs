@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Diet Tracker</title>
 </head>
 <body>
-<h1>Diet Tracker</h1>
+<h1>Diet Tracker - Adduserproduct</h1>
 <p></p>
 <p>
     <a href="/users">Show protocols</a> &middot;
@@ -24,6 +18,9 @@
             <td><label for="name">product name</label></td>
             <td></td><td><input type="text" required disabled /></td><td></td>
         </tr>-->
+		</p>
+        Set the number to either: 2 for high sensitivity. 1 for moderate sensitivity. 0 for no symptoms.
+        <p>
         <tr>
             <td><label for="gateway">User defined sensitivity rating</label></td>
             <td></td><td><input type="number" name="gateway" id="gateway" value="{{gateway}}" min="0" max="2" step="1" required autofocus /></td><td></td>
@@ -42,6 +39,10 @@
         </tr>
 
         <tr><td colspan="4"><hr></td></tr>
+        
+        <tr><td colspan="4">Set the number to either: 4 for beneficial value. 1 for neutral value. -4 for avoid. 0 for unknown. Changing the tun. is optional and can be left default.</td></tr>
+        
+        <tr><td colspan="4">&nbsp;</td></tr>
 
         <tr>
             <td><label for="conssubben">blood type & secretor status value</label></td>
@@ -61,6 +62,10 @@
         </tr>
 
         <tr><td colspan="4"><hr></td></tr>
+        
+        <tr><td colspan="4">Set the number to either: 4 for positive effect. -4 for negative effect. 0 if effect value is unknown. Changing the tun. is optional and can be left default.</td></tr>
+                
+        <tr><td colspan="4">&nbsp;</td></tr>
 
         <tr>
             <td><label for="envben">microbiome diversity value</label></td>
