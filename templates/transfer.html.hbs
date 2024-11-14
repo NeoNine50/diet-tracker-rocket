@@ -32,9 +32,12 @@
             <td>
               <select name="producer" id="producer" required autofocus>
                   {{#each users}}
-              <option value="{{id}}" data-id="{{id}}" data-nbr="{{nbr}}">{{name}}</option>
+              <option value="{{id}}" data-id="{{id}}" data-nbr="{{nbr}}" 
+                {{#if (eq name "Blood Type O Secretor")}}selected{{/if}}>
+                {{name}}
+              </option>
                   {{/each}}
-                  </select>
+              </select>
                   <label>
                   <input type="checkbox" id="defaultProducer"> Make Default
                   </label>
@@ -88,7 +91,7 @@
         <tr>
             <td></td>
             <td>
-                <input type="submit" value="Transfer"/>
+                <input type="submit" value="Submit"/>
             </td>
         </tr>
     </table>
