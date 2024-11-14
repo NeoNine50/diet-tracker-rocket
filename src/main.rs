@@ -80,8 +80,8 @@ async fn main() -> Result<(), rocket::Error> {
     #[cfg(feature = "gui")] {
         rct = rct.attach(AdHoc::on_liftoff("Liftoff Printer", |_| Box::pin(async move {
             println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-            println!("Please open http://localhost:8000/transfer in web browser.\n");
-            webbrowser::open("http://localhost:8000/transfer").ok();
+            println!("Please open http://localhost:8000/users in web browser.\n");
+            webbrowser::open("http://localhost:8000/users").ok();
         })))
     }
 
