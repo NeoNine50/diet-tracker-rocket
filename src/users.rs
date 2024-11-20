@@ -53,7 +53,7 @@ pub async fn adduser(user: Form<User>, db_conn: &State<DbConn>, templatedir: &St
 
     Flash::success(Redirect::to("/"),
                    if templatedir.0 { "Uživatel přidán." }
-                   else { "User added." })
+                   else { "Profile added to protocols list." })
 }
 
 #[get("/users")]
